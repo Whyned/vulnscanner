@@ -5,17 +5,24 @@ NO_KWARGS = {}
 
 def concurrent_worker(worker_generator, limit):
     """
-    Executes parallel workers. We don't execute more than by limit defined
-    workers at the same time. Workers need to get produced by worker_generator
-    which is a function which should return a tuple with 3 elements where the
-    first element is a reference to the worker function, second kargs and third
-    kwargs. If worker_generator can't produce any more workers, it's enough to
-    return False.
+    This method runs N (limit) workers at the same time, and as soon one
+    completes, it will get a new one from worker_generator. worker_generator
+    has to be a normal generator (pass it already initialized) which has to
+    a tuple with 3 elements. First needs to be a callable (the worker method),
+    second kargs and third kwargs.
+    This method blocks until worker_generator doesn't yield any more workers
+    and all workers are finished.
     """
 
     work_loader_lock = threading.Lock()
     def work_loader():
+        """
+        This method should be run in it's own thread and executes one worker
+        after the other until worker_generator doesn't yield any more workers.
+        """
         while True:
+            # With the lock we make sure that only one work_loader tries to
+            # get the next worker
             work_loader_lock.acquire()
             try:
                 worker, kargs, kwargs = next(worker_generator)

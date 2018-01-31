@@ -13,8 +13,7 @@ class RandomIPv4Waiter(HostPortWaiterInterface):
     def generator(self):
         while self.limit_generate != 0:
             randomIPv4 = generateRandomIPv4()
-            for port in self.ports:
-                yield (randomIPv4, port)
+            yield (randomIPv4, self.ports)
             if self.limit_generate != -1:
                 self.limit_generate -= 1
 

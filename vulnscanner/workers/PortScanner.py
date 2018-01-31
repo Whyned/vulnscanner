@@ -1,8 +1,8 @@
 import socket
 
-from .WorkerInterface import WorkerInterface
+from .Worker import Worker, SKIP_HOST
 
-class PortScannerWorker(WorkerInterface):
+class PortScannerWorker(Worker):
     def __init__(self, options):
         self.timeout = options['timeout']
 
@@ -10,5 +10,5 @@ class PortScannerWorker(WorkerInterface):
         try:
             socket.create_connection((host, port), self.timeout)
         except Exception:
-            return
+            return SKIP_HOST
         print("Open: %s:%s" %(host, port))
