@@ -1,8 +1,8 @@
 import random
 
-from .HostPortWaiterInterface import HostPortWaiterInterface
+from . import WaiterInterface
 
-class RandomIPv4Waiter(HostPortWaiterInterface):
+class RandomIPv4Waiter(WaiterInterface):
     """
     HostPortWaiter which generates random ipv4 adresses
     """

@@ -1,9 +1,6 @@
-SKIP_HOST = 1
-
-
-class Worker:
+class WaiterInterface:
     def __init__(self, options):
         self.options = options
 
-    def processHostPort(self, host, port):
+    def generator(self):
         pass

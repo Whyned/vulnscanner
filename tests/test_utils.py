@@ -2,7 +2,7 @@ import unittest
 import time
 import threading as threading2
 
-from vulnscanner.utils import threading
+from vulnscanner.utils import concurrent_worker
 
 def test_concurrent_worker():
     """
@@ -25,7 +25,7 @@ def test_concurrent_worker():
             test_concurrent_worker.max_active_threads = ac
         time.sleep(0.5)
 
-    threading.concurrent_worker(worker_generator(), limit)
+    concurrent_worker(worker_generator(), limit)
     assert threading2.active_count() == 1
     assert test_concurrent_worker.called_workers == limit
     assert test_concurrent_worker.max_active_threads == limit + 1

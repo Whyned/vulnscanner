@@ -1,6 +1,6 @@
 import socket
 
-from .Worker import Worker, SKIP_HOST
+from . import Worker, SKIP_HOST
 
 class PortScannerWorker(Worker):
     def __init__(self, options):
