@@ -9,6 +9,8 @@ class PortScannerWorker(Worker):
     def processHostPort(self, host, port):
         try:
             socket.create_connection((host, port), self.timeout)
-        except Exception:
+        except ConnectionRefusedError:
+            return None
+        except Exception as e:
             return SKIP_HOST
         print("Open: %s:%s" %(host, port))
