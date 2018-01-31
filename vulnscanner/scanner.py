@@ -1,8 +1,8 @@
 import threading as threading2
 import time
 
-from waiters.RandomIPv4 import RandomIPv4Waiter
-from workers.PortScanner import PortScannerWorker
+from waiters.random_ipv4 import RandomIPv4Waiter
+from workers.port_scanner import PortScannerWorker
 from workers import SKIP_HOST
 
 from utils import threading
@@ -39,4 +39,5 @@ if __name__ == '__main__':
         PortScannerWorker({'timeout': 3})
     ]
     s = Scanner(waiters, workers, 200)
+
     s.run()

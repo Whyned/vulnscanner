@@ -2,13 +2,15 @@ import re
 
 from ..utils import assertRaises
 
-from vulnscanner.waiters.RandomIPv4 import generateRandomIPv4, RandomIPv4Waiter
+from vulnscanner.waiters.random_ipv4 import generateRandomIPv4
+from vulnscanner.waiters.random_ipv4 import RandomIPv4Waiter
 
 re_match_ipv4 = re.compile('^(([01]?[0-9]?[0-9]|2[0-4][0-9]|2[5][0-5])\.){3}([01]?[0-9]?[0-9]|2[0-4][0-9]|2[5][0-5])$')
 
 def test_generateRandomIPv4():
     """
-    Should only generate valid ipv4 adresses
+    Should on
+    ly generate valid ipv4 adresses
     """
     for i in range(0, 200):
         assert re_match_ipv4.match(generateRandomIPv4()) is not None
