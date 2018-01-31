@@ -1,5 +1,7 @@
 import threading
 
+import logger
+
 NO_KARGS = []
 NO_KWARGS = {}
 
@@ -14,30 +16,39 @@ def concurrent_worker(worker_generator, limit):
     and all workers are finished.
     """
 
-    work_loader_lock = threading.Lock()
-    def work_loader():
+    worker_loader_lock = threading.Lock()
+    def worker_loader():
         """
         This method should be run in it's own thread and executes one worker
         after the other until worker_generator doesn't yield any more workers.
         """
+        logger.silly('Started new worker_loader')
         while True:
-            # With the lock we make sure that only one work_loader tries to
+            # With the lock we make sure that only one worker_loader tries to
             # get the next worker
-            work_loader_lock.acquire()
+            worker_loader_lock.acquire()
             try:
                 worker, kargs, kwargs = next(worker_generator)
             except StopIteration:
+                logger.silly('worker_generator yielded None')
                 worker = False
-            work_loader_lock.release()
+            worker_loader_lock.release()
 
-            if worker is False: break
-            worker(*kargs, **kwargs)
+            if worker is False:
+                break
+            try:
+                worker(*kargs, **kwargs)
+            except Exception as e:
+                logger.error('Catched Exception %s in worker' %e)
+        logger.silly('Finished a worker_loader')
 
     threads = []
     for i in range(0, limit):
-        t = threading.Thread(target=work_loader)
+        t = threading.Thread(target=worker_loader)
         t.start()
         threads.append(t)
 
     # Block till all threads are finished
-    while len(threads) > 0: threads.pop(0).join()
+    while len(threads) > 0:
+        logger.silly('Waiting for %s worker_loaders to finish' %len(threads))
+        threads.pop(0).join()

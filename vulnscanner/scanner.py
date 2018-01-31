@@ -1,6 +1,7 @@
 import threading as threading2
 import time
 
+import logger
 from workers import SKIP_HOST
 from workers.port_scanner import PortScannerWorker
 from waiters.random_ipv4 import RandomIPv4Waiter
@@ -12,7 +13,7 @@ class Scanner:
             raise Exception('Without workers, who should do the work?')
         self.workers = workers
 
-        # We only need to have the initialized waiter generators
+        # We only need the initialized waiter generators
         self.waiters = [waiter.generator() for waiter in waiters]
 
         self.limit = limit
@@ -31,12 +32,13 @@ class Scanner:
                 if w.processHostPort(host, port) == SKIP_HOST: return
 
 if __name__ == '__main__':
+    logger.LOG_LEVELS_FILES['debug.txt'] = [logger.LOG_SILLY, logger.LOG_DEBUG]
     waiters = [
         RandomIPv4Waiter({'ports': (80,8080)})
     ]
     workers = [
         PortScannerWorker({'timeout': 3})
     ]
-    s = Scanner(waiters, workers, 200)
 
+    s = Scanner(waiters, workers, 1000)
     s.run()
