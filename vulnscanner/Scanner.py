@@ -15,23 +15,14 @@ class Scanner:
         self.limit = limit
 
     def run(self):
-        threading.concurrent_worker(self.worker_producer, self.limit)
+        threading.concurrent_worker(self.worker_producer(), self.limit)
 
     def worker_producer(self):
-        host = False
-        port = False
         while len(self.waiters) > 0:
-            try:
-                host, port= next(self.waiters[0])
-                break
-            except StopIteration:
-                self.waiters.pop(0)
+            for host, port in self.waiters[0]:
+                yield (self.worker_wrapper, (host, port), threading.NO_KWARGS)
 
-        if host is False:
-            # No waiter can give us host/port pairs anymore, we're done
-            return False
-
-        return (self.worker_wrapper, (host, port), threading.NO_KWARGS)
+            self.waiters.pop(0)
 
     def worker_wrapper(self, host, port):
         #print(host, port)
