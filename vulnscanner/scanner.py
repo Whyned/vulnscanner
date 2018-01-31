@@ -1,11 +1,10 @@
 import threading as threading2
 import time
 
-from waiters.random_ipv4 import RandomIPv4Waiter
-from workers.port_scanner import PortScannerWorker
 from workers import SKIP_HOST
-
-from utils import threading
+from workers.port_scanner import PortScannerWorker
+from waiters.random_ipv4 import RandomIPv4Waiter
+from utils import concurrent_worker, NO_KWARGS
 
 class Scanner:
     def __init__(self, waiters, workers, limit):
@@ -19,12 +18,12 @@ class Scanner:
         self.limit = limit
 
     def run(self):
-        threading.concurrent_worker(self.worker_generator(), self.limit)
+        concurrent_worker(self.worker_generator(), self.limit)
 
     def worker_generator(self):
         while len(self.waiters) > 0:
             for host, port in self.waiters.pop(0):
-                yield (self.worker, (host, port), threading.NO_KWARGS)
+                yield (self.worker, (host, port), NO_KWARGS)
 
     def worker(self, host, ports):
         for w in self.workers:
