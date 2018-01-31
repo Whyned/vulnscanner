@@ -1,5 +1,7 @@
 import re
 
+from ..utils_test import assertRaises
+
 from vulnscanner.host_port_waiters.RandomIPv4 import generateRandomIPv4
 from vulnscanner.host_port_waiters.RandomIPv4 import RandomIPv4Waiter
 
@@ -35,10 +37,11 @@ def test_RandomIPv4Waiter_2():
     generator = r.generator()
     flip = False
     for i in range(0, 401):
-        ip, port = next(generator)
         if i == 400:
-            assert ip is False
-        else:
-            assert re_match_ipv4.match(ip) is not None
-            assert port == 8080 if flip else port == 80
-            flip = not flip
+            assertRaises(StopIteration, next, generator)
+            break
+
+        ip, port = next(generator)
+        assert re_match_ipv4.match(ip) is not None
+        assert port == 8080 if flip else port == 80
+        flip = not flip

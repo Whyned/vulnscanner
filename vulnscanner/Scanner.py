@@ -1,23 +1,49 @@
 import threading as threading2
 import time
+
+from host_port_waiters.RandomIPv4 import RandomIPv4Waiter
+from workers.PortScanner import PortScannerWorker
+
 from utils import threading
 
 class Scanner:
-    def __init__(self, options):
-        self.timeout = options.get('timeout', 10)
-        self.limit = options.get('limit', 200)
+    def __init__(self, waiters, workers, limit):
+        self.waiters = [w.generator() for w in waiters]
+        if len(workers) == 0:
+            raise Exception('Without workers, we can\'t do a thing')
+        self.workers = workers
+        self.limit = limit
 
     def run(self):
         threading.concurrent_worker(self.worker_producer, self.limit)
 
     def worker_producer(self):
-        return (self.test_worker, (1,2,3), threading.NO_KWARGS)
+        host = False
+        port = False
+        while len(self.waiters) > 0:
+            try:
+                host, port= next(self.waiters[0])
+                break
+            except StopIteration:
+                self.waiters.pop(0)
 
-    @staticmethod
-    def test_worker(*kargs, **kwargs):
-        print('Huhuu %s %s %s' %(kargs, kwargs, threading2.active_count()))
-        time.sleep(3)
+        if host is False:
+            # No waiter can give us host/port pairs anymore, we're done
+            return False
+
+        return (self.worker_wrapper, (host, port), threading.NO_KWARGS)
+
+    def worker_wrapper(self, host, port):
+        #print(host, port)
+        for w in self.workers:
+            w.processHostPort(host, port)
 
 if __name__ == '__main__':
-    s = Scanner({})
+    waiters = [
+        RandomIPv4Waiter({'ports': (80,8080)})
+    ]
+    workers = [
+        PortScannerWorker({'timeout': 3})
+    ]
+    s = Scanner(waiters, workers, 200)
     s.run()
