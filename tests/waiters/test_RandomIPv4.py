@@ -16,7 +16,7 @@ def test_generateRandomIPv4():
 def test_RandomIPv4Waiter_1():
     """
     Generator should return same ip adress for each port, ip adresses should
-    be valid ipv4
+    be valid ipv4 adresses
     """
     r = RandomIPv4Waiter({'ports':(80,8080)})
     generator = r.generator()
