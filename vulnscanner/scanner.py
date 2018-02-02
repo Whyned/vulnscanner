@@ -32,7 +32,15 @@ class Scanner:
                 if w.processHostPort(host, port) == SKIP_HOST: return
 
 if __name__ == '__main__':
-    logger.LOG_LEVELS_FILES['debug.txt'] = [logger.LOG_SILLY, logger.LOG_DEBUG]
+    logger.LOG_LEVELS_FILES['debug.txt'] = [
+        logger.LOG_INFO,
+        logger.LOG_WARN,
+        logger.LOG_ERROR,
+        logger.LOG_DEBUG,
+        logger.LOG_SILLY
+    ]
+    logger.attach()
+
     waiters = [
         RandomIPv4Waiter({'ports': (80,8080)})
     ]

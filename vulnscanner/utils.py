@@ -36,10 +36,7 @@ def concurrent_worker(worker_generator, limit):
 
             if worker is False:
                 break
-            try:
-                worker(*kargs, **kwargs)
-            except Exception as e:
-                logger.error('Catched Exception %s in worker' %e)
+            worker(*kargs, **kwargs)
         logger.silly('Finished a worker_loader')
 
     threads = []
