@@ -25,7 +25,7 @@ class Scanner:
         try:
             concurrent_worker(self.worker_generator(), self.limit)
         except Exception:
-            logger.error('Scanner: Unexpected Error: %s' %tb = traceback.format_exc())
+            logger.error('Scanner: Unexpected Error: %s' %traceback.format_exc())
 
     def worker_generator(self):
         while len(self.waiters) > 0:
