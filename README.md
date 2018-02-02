@@ -1,11 +1,11 @@
 # VulnScanner
 A python3 vulnscanner with the goal to have an configurable, easy to hack and performant multi purpose vulnerability scanner.
 
-# Introduction
+## Introduction
 Currently this is WIP, but for the moment already random port scanning works.
 You can test it by executing `python3 -m vulnscanner`. To change ports to scan for, timeout etc have a look at `vulnscanner/__main__.py`
 
-# Development
+## Development
 Needed python modules:
 - nosetests
 - coverage
