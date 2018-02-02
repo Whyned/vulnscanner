@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/Whyned/vulnscanner.svg?branch=master)](https://travis-ci.org/Whyned/vulnscanner)
+[![Coverage Status](https://coveralls.io/repos/github/Whyned/vulnscanner/badge.svg?branch=master)](https://coveralls.io/github/Whyned/vulnscanner?branch=master)
 # VulnScanner
 A python3 vulnscanner with the goal to have an configurable, easy to hack and performant multi purpose vulnerability scanner.
 
