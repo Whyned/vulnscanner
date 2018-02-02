@@ -2,7 +2,10 @@ import unittest
 import time
 import threading as threading2
 
+
 from vulnscanner.utils import concurrent_worker
+from vulnscanner import logger
+logger.attach()
 
 def test_concurrent_worker():
     """

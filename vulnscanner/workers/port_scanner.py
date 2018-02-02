@@ -1,7 +1,9 @@
 import socket
 
-from . import Worker, SKIP_HOST
-import logger
+from vulnscanner import logger
+from vulnscanner.workers import Worker, SKIP_HOST
+
+RESULT_FILE = 'open_ports.result'
 
 class PortScannerWorker(Worker):
     def __init__(self, options):
@@ -17,4 +19,4 @@ class PortScannerWorker(Worker):
         except Exception as e:
             logger.debug('PortScannerWorker Catched Exception: %s' %e)
             return SKIP_HOST
-        logger.debug('PortScannerWorker Open: %s:%s' %(host, port))
+        logger.result('PortScanner', 'open', RESULT_FILE, '%s:%s' %(host, port))

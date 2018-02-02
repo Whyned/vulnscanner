@@ -6,8 +6,9 @@ LOG_WARN = 'WARN'
 LOG_ERROR = 'ERROR'
 LOG_DEBUG = 'DEBUG'
 LOG_SILLY = 'SILLY'
+LOG_RESULT = 'RESULT'
 
-LOG_LEVELS_STDOUT = [LOG_INFO, LOG_WARN, LOG_ERROR]
+LOG_LEVELS_STDOUT = [LOG_INFO, LOG_WARN, LOG_ERROR, LOG_DEBUG, LOG_RESULT]
 LOG_LEVELS_FILES = {
     'error.txt': [LOG_ERROR],
     #'debug.txt': [LOG_INFO, LOG_WARN, LOG_ERROR, LOG_DEBUG, LOG_SILLY]
@@ -50,16 +51,24 @@ def log_curry(level):
 
     return composer
 
+_LOG_RESULT_TO_STDOUT = None
+def log_result(worker_name, type, file, str):
+    if _LOG_RESULT_TO_STDOUT is True:
+        write_to_stdout('RESULT: [%s]{%s} %s' %(worker_name, type, str))
+    append_to_file(file, str)
+
 def raiser_not_attached_yet(*kargs, **kwargs):
     raise Exception('Logger not attached yet. Please first call #attach()')
     sys.exit(0)
 
-info = warn = error = debug = silly = raiser_not_attached_yet
+info = warn = error = debug = silly = result = raiser_not_attached_yet
 
 def attach():
-    global info, warn, error, debug, silly
+    global info, warn, error, debug, silly, result, _LOG_RESULT_TO_STDOUT
     info = log_curry(LOG_INFO)
     warn = log_curry(LOG_WARN)
     error = log_curry(LOG_ERROR)
     debug = log_curry(LOG_DEBUG)
     silly = log_curry(LOG_SILLY)
+    _LOG_RESULT_TO_STDOUT = LOG_RESULT in LOG_LEVELS_STDOUT
+    result = log_result

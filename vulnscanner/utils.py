@@ -1,6 +1,6 @@
 import threading
 
-import logger
+from vulnscanner import logger
 
 NO_KARGS = []
 NO_KWARGS = {}
