@@ -2,7 +2,7 @@ language: python
 python:
     - "3.6"
 install: 
-    - pip install nosetests coverage
+    - pip install -r requirements-dev.txt
 script:
     - make all
 
