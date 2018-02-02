@@ -1,6 +1,7 @@
 language: python
+python:
+    - "3.6"
 install: 
-    - sudo apt-get --yes install make pip
     - pip install nosetests coverage
 script:
     - make all
