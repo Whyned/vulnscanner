@@ -1,11 +1,8 @@
-import os
-
 from ..utils import assertRaises
 
 from vulnscanner.waiters.host_port_file import HostPortFileWaiter
 
 def test_host_port_waiter_1():
-    print(os.getcwd())
     waiter = HostPortFileWaiter({'file': './test_files/host_port_file_1.txt'})
     generator = waiter.generator()
     assert next(generator) == ('127.0.0.1', [80])

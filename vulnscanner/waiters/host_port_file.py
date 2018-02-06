@@ -1,11 +1,8 @@
-import random
-
 from . import WaiterInterface
 
 class HostPortFileWaiter(WaiterInterface):
     def __init__(self, options):
         self.file = open(options['file'], 'r')
-
 
     def generator(self):
         for line in self.file:
