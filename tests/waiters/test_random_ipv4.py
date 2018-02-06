@@ -1,7 +1,5 @@
 import re
 
-from ..utils import assertRaises
-
 from vulnscanner.waiters.random_ipv4 import generateRandomIPv4
 from vulnscanner.waiters.random_ipv4 import RandomIPv4Waiter
 
