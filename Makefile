@@ -1,7 +1,8 @@
 TEST_CMD = nosetests -w ./tests --no-byte-compile
-COVERAGE_CMD = nosetests --with-coverage --cover-package=vulnscanner --cover-erase --cover-inclusive --cover-html --cover-html-dir=./coverage
+COVERAGE_CMD = $(TEST_CMD) --with-coverage --cover-package=vulnscanner --cover-erase --cover-inclusive
+COVERAGE_HTML_CMD = $(COVERAGE_CMD) --cover-html --cover-html-dir=./coverage
 
-.PHONY: all test clean clean-build clean-pyc coverage
+.PHONY: all test clean clean-build clean-pyc coverage coverage-html
 
 all: clean coverage
 
@@ -22,3 +23,6 @@ clean-pyc:
 
 coverage:
 	$(COVERAGE_CMD)
+
+coverage-html:
+	$(COVERAGE_HTML_CMD)
