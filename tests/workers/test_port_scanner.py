@@ -43,3 +43,15 @@ def test_PortScannerWorker_2():
     pw.processHostPort('127.0.0.1', 9999)
 
     assert test_PortScannerWorker_2.fetched is False
+
+def test_PortScannerWorker_3():
+    test_PortScannerWorker_2.fetched = False
+    def result_fetcher(worker_name, type, file, str):
+        test_PortScannerWorker_2.fetched = True
+
+    logger.result = result_fetcher
+
+    pw = PortScannerWorker({'timeout': 10})
+    pw.processHostPort('999.999.999.999', 9999)
+
+    assert test_PortScannerWorker_2.fetched is False
