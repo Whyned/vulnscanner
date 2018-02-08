@@ -10,50 +10,57 @@ class HttpResponseWorker(Worker):
 
     def addModuleMethodPathOptionsCallable(self, module, method, path, options={}, callable=None):
         if method not in ALLOWED_METHODS:
-            raise Exception('Illegal method "%s" for module "%s" and path "%s"' %(method, type(module).__name__, path))
+            raise Exception(
+                'Illegal method "%s" for module "%s" and path "%s"'
+                %(method, type(module).__name__, path))
 
-        if method not in self.methods_paths_options_modules:
-            self.methods_paths_options_modules[method] = {}
-        if path not in self.methods_paths_options_modules[method]:
-            self.methods_paths_options_modules[method][path] = []
+        mpom = self.methods_paths_options_modules
+        if method not in mpom:
+            mpom[method] = {}
+        if path not in mpom[method]:
+            mpom[method][path] = []
 
         option_callable_index = None
-        for i in range(0, len(self.methods_paths_options_modules[method][path])):
-            if self.methods_paths_options_modules[method][path][i][0] == options:
+        for i in range(0, len(mpom[method][path])):
+            if mpom[method][path][i][0] == options:
                 option_callable_index = i
                 break
         if option_callable_index is None:
-            self.methods_paths_options_modules[method][path].append([options])
-            option_callable_index = len(self.methods_paths_options_modules[method][path]) - 1
+            mpom[method][path].append([options])
+            option_callable_index = len(mpom[method][path]) - 1
 
         if callable is None:
             callable = module.processResult
-        if callable in self.methods_paths_options_modules[method][path][option_callable_index]:
-            raise Exception('Module "%s" tried to add the same method "%s" for the same path "%s" twice' %(type(module).__name__, method, path))
-        self.methods_paths_options_modules[method][path][option_callable_index].append(callable)
+        if callable in mpom[method][path][option_callable_index]:
+            raise Exception(
+                'Module "%s" tried to add the same method "%s" for the same path "%s" twice'
+                %(type(module).__name__, method, path))
+        mpom[method][path][option_callable_index].append(callable)
 
+    def iterateMPOM(self):
+        mpom = self.methods_paths_options_modules
+        for (method, path_options_callables) in mpom.items():
+            for (path, options_callables) in mpom[method].items():
+                for options_callables in options_callables:
+                    options = options_callables[0]
+                    for callable in options_callables[1:]:
+                        yield (method, path, options, callable)
 
     def processHostPort(self, host, port):
-        for method_paths_modules in self.operation_paths:
-            method = method_paths_modules[0]
-            paths_modules = method_paths_modules[1]
-            for path_modules in paths_modules:
-                path = path_modules[0]
-                modules = path_modules[1]
-                for module in modules:
-                    module(result, method, path)
+        for (method, path, options, callable) in self.iterateMPOM():
+            pass
 
 
 class BaseModule():
     def __init__(self):
         pass
 
-    def registerMethodsAndPaths(self):
+    def registerMPOM(self):
         return [
             ('GET', '/admin/index.html')
         ]
 
-    def processResult(result, method, path):
+    def processResult(result, method, path, options):
         pass
 def test_module(method, path):
     print(method, path)

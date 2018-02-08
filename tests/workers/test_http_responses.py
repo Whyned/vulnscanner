@@ -61,3 +61,21 @@ def test_HttpResponseWorker_addModuleMethodPathOptionsCallable_1():
     assert worker.methods_paths_options_modules['GET'] == {
         '/test/test.html': [[{}, tm.processResult, c2], [{'user-agent': 'Foobar'}, c2]]
     }
+
+def test_HttpResponseWorker_iterateMPOM():
+    worker = HttpResponseWorker({'timeout': 3, 'modules': []})
+    processGotCalled = False
+    tm = TestModule(processGotCalled)
+
+    worker.addModuleMethodPathOptionsCallable(tm, 'GET', '/test/test.html')
+    worker.addModuleMethodPathOptionsCallable(tm, 'GET', '/test/test.html', {'user-agent': 'test'})
+    worker.addModuleMethodPathOptionsCallable(tm, 'GET', '/test2/test.html')
+    worker.addModuleMethodPathOptionsCallable(tm, 'POST', '/test/test.html', {'user-agent': 'test'})
+    worker.addModuleMethodPathOptionsCallable(tm, 'POST', '/test/test.html', {'user-agent': 'test'}, print)
+
+    generator = worker.iterateMPOM()
+    assert next(generator) == ('GET', '/test/test.html', {}, tm.processResult)
+    assert next(generator) == ('GET', '/test/test.html', {'user-agent': 'test'}, tm.processResult)
+    assert next(generator) == ('GET', '/test2/test.html', {}, tm.processResult)
+    assert next(generator) == ('POST', '/test/test.html', {'user-agent': 'test'}, tm.processResult)
+    assert next(generator) == ('POST', '/test/test.html', {'user-agent': 'test'}, print)
