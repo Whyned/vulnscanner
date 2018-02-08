@@ -7,10 +7,11 @@ def assertRaisesMessage(exception, message, callable, *kargs, **kwargs):
     try:
         callable(*kargs, **kwargs)
     except exception as e:
-        if message is not None:
-            assert str(e) == message
+        e = str(e)
+        if message is not None and e != message:
+            raise AssertionError('Excepted thrown error to be: \r\n %s \r\n but was: \r\n %s' %(message, e    ))
         threw_error = True
 
     if threw_error is False:
-        raise AssertionError('Expected %s() to throw %s'
+        raise AssertionError('Expected %s() to throw Error %s'
             %(callable.__name__, exception.__name__))

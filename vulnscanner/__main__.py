@@ -1,7 +1,9 @@
 from vulnscanner import logger
 from vulnscanner.scanner import Scanner
 from vulnscanner.waiters.random_ipv4 import RandomIPv4Waiter
+from vulnscanner.waiters.range_file import RangeFileWaiter
 from vulnscanner.workers.port_scanner import PortScannerWorker
+
 
 def main():
     #logger.LOG_LEVELS_FILES['debug.txt'] = [
@@ -18,7 +20,8 @@ def main():
     logger.attach()
 
     waiters = [
-        RandomIPv4Waiter({'ports': (80,8080)})
+        #RandomIPv4Waiter({'ports': (80,8080)})
+        RangeFileWaiter({'ports': (80,8080), 'file': 'range.txt'})
     ]
     workers = [
         PortScannerWorker({'timeout': 3})
@@ -27,4 +30,5 @@ def main():
     s = Scanner(waiters, workers, 200)
     s.run()
 
-main()
+if __name__ == "__main__":
+    main() 
