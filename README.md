@@ -12,7 +12,8 @@ We use a Makefile to run different build scripts, so you need to have GNU Make i
 We currently depend on the nose and coverage python modules, to install them, you can simply run `pip install -r requirements-dev.txt`. Make sure pip defaults to your python3 pip.
 
 ## Available make rules
-- Run tests with `make test`
-- Run tests with coverage with `make coverage`
-- Clean with `make clean`
+- `make test` Run tests
+- `make coverage` Run tests with coverage
+- `make coverage-html` Run tests with coverage and create html coverage report in `./coverage`
+- `make clean` clean folder from coverages, py cache files etc.
 
