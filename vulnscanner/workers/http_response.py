@@ -6,49 +6,39 @@ class HttpResponseWorker(Worker):
     def __init__(self, options):
         self.timeout = options['timeout']
         self.modules = options['modules']
-        self.methods_paths_options_modules = {}
+        self.methods_paths_options_modules = []
 
-    def addModuleMethodPathOptionsCallable(self, module, method, path, options={}, callable=None):
+    def addModule(self, module, method, path, options={}, *callables):
         if method not in ALLOWED_METHODS:
             raise Exception(
                 'Illegal method "%s" for module "%s" and path "%s"'
                 %(method, type(module).__name__, path))
 
-        mpom = self.methods_paths_options_modules
-        if method not in mpom:
-            mpom[method] = {}
-        if path not in mpom[method]:
-            mpom[method][path] = []
+        if len(callables) == 0:
+            callables = [module.processResult]
 
-        option_callable_index = None
-        for i in range(0, len(mpom[method][path])):
-            if mpom[method][path][i][0] == options:
-                option_callable_index = i
+        indexMPOMC = None
+        for i in range(0, len(self.methods_paths_options_modules)):
+            mpomc = self.methods_paths_options_modules[i]
+            if mpomc[0] == method and mpomc[1] == path and mpomc[2] == options:
+                for c in callables:
+                    if c in mpomc[3:]:
+                        raise Exception(
+                            'Module "%s" tried to add the same callable "%s" for the same path "%s" twice'
+                            %(type(module).__name__, c.__name__, path))
+                indexMPOMC = i
                 break
-        if option_callable_index is None:
-            mpom[method][path].append([options])
-            option_callable_index = len(mpom[method][path]) - 1
 
-        if callable is None:
-            callable = module.processResult
-        if callable in mpom[method][path][option_callable_index]:
-            raise Exception(
-                'Module "%s" tried to add the same method "%s" for the same path "%s" twice'
-                %(type(module).__name__, method, path))
-        mpom[method][path][option_callable_index].append(callable)
-
-    def iterateMPOM(self):
-        mpom = self.methods_paths_options_modules
-        for (method, path_options_callables) in mpom.items():
-            for (path, options_callables) in mpom[method].items():
-                for options_callables in options_callables:
-                    options = options_callables[0]
-                    for callable in options_callables[1:]:
-                        yield (method, path, options, callable)
+        if indexMPOMC is None:
+            self.methods_paths_options_modules.append(
+                [method, path, options, *callables])
+        else:
+            self.methods_paths_options_modules[indexMPOMC].append(*callables)
 
     def processHostPort(self, host, port):
-        for (method, path, options, callable) in self.iterateMPOM():
-            pass
+        for mpom in self.iterateMPOM():
+            method, route, options = mpom[0], mpom[1], mpom[2]
+            callables = mpom[3:]
 
 
 class BaseModule():
@@ -56,11 +46,7 @@ class BaseModule():
         pass
 
     def registerMPOM(self):
-        return [
-            ('GET', '/admin/index.html')
-        ]
+        pass
 
     def processResult(result, method, path, options):
         pass
-def test_module(method, path):
-    print(method, path)
