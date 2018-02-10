@@ -1,4 +1,5 @@
 import threading
+import requests
 
 from vulnscanner import logger
 
@@ -49,3 +50,18 @@ def concurrent_worker(worker_generator, limit):
     while len(threads) > 0:
         logger.silly('Waiting for %s worker_loaders to finish' %len(threads))
         threads.pop(0).join()
+
+def http_request(host, port, path, method, options):
+    url = craft_url(host, port, path)
+    r = None
+    if method == 'GET':
+        r = requests.get
+    elif method == 'POST':
+        r = requests.post
+    return r(url, **options)
+
+def craft_url(host, port, path='/', ssl=None):
+    if ssl is None and port == 443:
+        ssl = True
+    prot = 'https' if ssl else 'http'
+    return '%s://%s:%s%s' %(prot, host, port, path)

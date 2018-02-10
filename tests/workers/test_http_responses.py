@@ -1,7 +1,8 @@
 from ..utils import assertRaisesMessage
 
 from vulnscanner import logger
-from vulnscanner.workers.http_response import HttpResponseWorker, BaseModule
+from vulnscanner.workers.http_response import HttpResponseWorker
+from vulnscanner.modules import BaseModule
 
 logger.attach()
 

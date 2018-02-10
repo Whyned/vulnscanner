@@ -1,6 +1,6 @@
 from vulnscanner import logger
 from vulnscanner.workers import Worker, SKIP_HOST
-
+from vulnscanner.utils import http_request
 
 ALLOWED_METHODS = ['GET', 'POST']
 
@@ -52,16 +52,10 @@ class HttpResponseWorker(Worker):
 
     def processHostPort(self, host, port):
         for mpom in self.methods_paths_options_modules:
-            method, route, options = mpom[0], mpom[1], mpom[2]
+            method, path, options = mpom[0], mpom[1], mpom[2]
             callables = mpom[3:]
 
+            result = http_request(host, port, method, path, options)
 
-class BaseModule():
-    def __init__(self):
-        pass
-
-    def registerMPOM(self):
-        pass
-
-    def processResult(result, method, path, options):
-        pass
+            for c in callables:
+                c(return_request, method, path, options)
