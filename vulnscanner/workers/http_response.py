@@ -1,18 +1,31 @@
+from vulnscanner import logger
 from vulnscanner.workers import Worker, SKIP_HOST
+
 
 ALLOWED_METHODS = ['GET', 'POST']
 
 class HttpResponseWorker(Worker):
     def __init__(self, options):
         self.timeout = options['timeout']
-        self.modules = options['modules']
         self.methods_paths_options_modules = []
+        self.modules = []
+        if 'modules' not in options or len(options['modules']) == 0:
+            logger.warn('HttpResponseWorker got initialized without options.modules')
+        else:
+            self.registerModules(options['modules'])
 
-    def addModule(self, module, method, path, options={}, *callables):
+    def registerModules(self, modules):
+        for m in modules:
+            logger.debug('HttpResponseWorker registering module %s' %m)
+            mpoms = m.registerMPOM()
+            for mpom in mpoms:
+                self.addMPOM(m, *mpom)
+
+    def addMPOM(self, module, method, path, options={}, *callables):
         if method not in ALLOWED_METHODS:
             raise Exception(
                 'Illegal method "%s" for module "%s" and path "%s"'
-                %(method, type(module).__name__, path))
+                %(method, module.__class__.__name__, path))
 
         if len(callables) == 0:
             callables = [module.processResult]
@@ -25,18 +38,20 @@ class HttpResponseWorker(Worker):
                     if c in mpomc[3:]:
                         raise Exception(
                             'Module "%s" tried to add the same callable "%s" for the same path "%s" twice'
-                            %(type(module).__name__, c.__name__, path))
+                            %(module.__class__.__name__, c.__name__, path))
                 indexMPOMC = i
                 break
 
         if indexMPOMC is None:
-            self.methods_paths_options_modules.append(
-                [method, path, options, *callables])
+            mpom = [method, path, options]
+            for c in callables:
+                mpom.append(c)
+            self.methods_paths_options_modules.append(mpom)
         else:
             self.methods_paths_options_modules[indexMPOMC].append(*callables)
 
     def processHostPort(self, host, port):
-        for mpom in self.iterateMPOM():
+        for mpom in self.methods_paths_options_modules:
             method, route, options = mpom[0], mpom[1], mpom[2]
             callables = mpom[3:]
 

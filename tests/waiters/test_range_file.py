@@ -24,7 +24,6 @@ def test_RangeFileWaiter():
         for i4 in range(0, 256):
             assertIp = '1.1.%s.%s' %(str(i3),str(i4))
             ip, ports = next(generator)
-            print(ip, assertIp)
             assert ip == assertIp
             assert ports == [80,8080]
     assert next(generator) == ('1.2.0.0', [80,8080])
